@@ -1,0 +1,4 @@
+diffusers==0.4.0
+transformers==4.22.2
+ftfy==6.1.1
+Pillow==9.2.0

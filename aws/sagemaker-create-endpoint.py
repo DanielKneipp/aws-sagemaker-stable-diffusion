@@ -12,7 +12,7 @@ huggingface_model = HuggingFaceModel(
 
 # deploy the endpoint endpoint
 predictor = huggingface_model.deploy(
-    initial_instance_count=1, instance_type="ml.g4dn.xlarge"
+    initial_instance_count=1, instance_type="ml.g4dn.xlarge", endpoint_name='huggingface-pytorch-inference'
 )
 
 with open('endpoint-name.txt', 'w') as f:

@@ -1,0 +1,16 @@
+{
+  "version": "2.0",
+  "app_name": "sd-public-endpoint",
+  "lambda_timeout": 30,
+  "lambda_memory_size": 1024,
+  "environment_variables": {
+    "ENDPOINT_NAME": "huggingface-pytorch-inference"
+  },
+  "stages": {
+    "dev": {
+      "api_gateway_stage": "api",
+      "manage_iam_role": false,
+      "iam_role_arn": "arn:aws:iam::????????????:role/lambda-sagemaker-access"
+    }
+  }
+}

@@ -10,7 +10,7 @@
     "dev": {
       "api_gateway_stage": "api",
       "manage_iam_role": false,
-      "iam_role_arn": "arn:aws:iam::????????????:role/lambda-sagemaker-access"
+      "iam_role_arn": "<IAM_ROLE_ARN>"
     }
   }
 }

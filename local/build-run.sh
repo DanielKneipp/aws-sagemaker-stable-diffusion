@@ -1,4 +1,8 @@
+#!/usr/bin/env bash
 set -e
 
-tar -ch . | docker build -t stable-difusion:latest -f Dockerfile -
+cd ../
+docker build -t stable-difusion:latest -f local/Dockerfile .
+cd local/
+
 docker run --gpus=all -v "$(pwd)/output:/app/output" stable-difusion:latest

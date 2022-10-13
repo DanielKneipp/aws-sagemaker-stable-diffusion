@@ -1,6 +1,5 @@
 # From https://huggingface.co/docs/diffusers/optimization/mps
 
-# make sure you're logged in with `huggingface-cli login`
 from diffusers import StableDiffusionPipeline
 
 pipe = StableDiffusionPipeline.from_pretrained("../stable-diffusion-v1-4")

@@ -8,6 +8,8 @@ if [[ $INSTALL_TOOLING == 'true' ]]; then
     asdf plugin add awscli
     asdf plugin-add terraform https://github.com/asdf-community/asdf-hashicorp.git
     asdf install
+
+    pyenv install -s
 fi
 
 if [[ $OSTYPE == 'darwin'* ]]; then

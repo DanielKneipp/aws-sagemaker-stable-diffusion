@@ -168,7 +168,7 @@ After this the endpoint will be created, and also a file `endpoint-name.txt` so 
 
 Now we should be ready to run an inference. To do it, execute:
 
-```
+```bash
 bash sagemaker-use-endpoint.py
 ```
 

@@ -11,4 +11,4 @@ prompt = "a photo of an astronaut riding a horse on mars. VFX, octane renderer"
 with torch.autocast("cuda"):
     image = pipe(prompt).images[0]
 
-image.save("output/astronaut_rides_horse.png")
+image.save("output/output.png")

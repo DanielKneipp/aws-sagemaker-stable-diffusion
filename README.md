@@ -5,7 +5,7 @@
 ![Taken from official Stable Diffusion release page](assets/sd-example-official-release.png)
 ![Taken from official Stable Diffusion release page](assets/sd-example-official-release-2.png)
 
-In this repo you will find everything need in order to spin-up your own personal public endpoint with a Stable Diffusion model deployed using AWS SageMaker to show your friends 😎
+In this repo you will find everything needed in order to spin-up your own personal public endpoint with a Stable Diffusion model deployed using AWS SageMaker to show your friends 😎
 
 - [Your own Stable Diffusion endpoint with AWS SageMaker](#your-own-stable-diffusion-endpoint-with-aws-sagemaker)
   - [TL;DR](#tldr)
@@ -73,7 +73,7 @@ bash setup.sh
 
 ## Trying the model locally
 
-To better understand how to use the model and the inference code we'll use later on, we first should try to run the model locally. Based on the [official release page](https://stability.ai/blog/stable-diffusion-public-release) you should be able to access the model weights on their [huggingface page](https://huggingface.co/CompVis/stable-diffusion-v1-4). Here we will use the version `v1.4`.
+To better understand how to use the model and the inference code we'll use later on, we first should try to run the model locally. Based on the [official release page](https://stability.ai/blog/stable-diffusion-public-release) you should be able to access the model weights on their [huggingface page](https://huggingface.co/CompVis/stable-diffusion-v1-4). Here we will use version `v1.4`.
 
 > 📄 In order to have access to the weights, you have to accept their terms of use
 
@@ -114,7 +114,7 @@ Showing all resources needed and from which directory each resource is managed. 
 | Directory | Description |
 | --------- | ----------- |
 | `lambda`  | Has the lambda + API Gateway implementation using a framework called [chalice](https://aws.github.io/chalice/#)|
-| `sagemaker` | Contains the python code for manage the SageMaker Model, Endpoint, and the custom inference code. It also has the script used to pack and send the model to a S3 bucket |
+| `sagemaker` | Contains the python code to manage the SageMaker Model, Endpoint, and the custom inference code. It also has the script used to pack and send the model to an S3 bucket |
 | `terraform` | Manages the S3 bucket itself and the IAM roles required by the lambda code (to access the SageMaker endpoint) and for the Sagemaker endpoint (to access the model on the S3 bucket) |
 
 ### Initial setup
@@ -226,7 +226,7 @@ And now you should have a public endpoint to access the Model, you should be abl
 To clean up everything (and avoid unwanted AWS costs 💸), you can do:
 
 ```bash
-# Delete the serverless ap
+# Delete the serverless app
 cd lambda/sd-public-endpoint/
 chalice delete
 

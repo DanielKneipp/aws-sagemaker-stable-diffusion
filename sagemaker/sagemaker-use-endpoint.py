@@ -3,11 +3,9 @@ from pathlib import Path
 
 from sagemaker.huggingface.model import HuggingFacePredictor
 
+import conf
 
-with open("endpoint-name.txt", "r") as f:
-    endpoint_name = f.read()
-
-predictor = HuggingFacePredictor(endpoint_name=endpoint_name)
+predictor = HuggingFacePredictor(endpoint_name=conf.RESOURCE_NAME)
 
 data = {"prompt": "darth vader dancing on top of the millennium falcon"}
 

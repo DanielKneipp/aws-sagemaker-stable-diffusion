@@ -162,7 +162,21 @@ pip install -r requirements  # To install the sagemaker pkg
 python sagemaker-create-endpoint.py
 ```
 
-After this the endpoint will be created, and also a file `endpoint-name.txt` so that the other python scripts can keep its reference. When the endpoint is ready, you will be able to see it in the AWS console like the following image:
+> <details>
+>   <summary><em>⚠️ In case you receive a <code>ResourceLimitExceeded</code> error...</em></summary>
+>
+>   In case you receive a `ResourceLimitExceeded` error like the following:
+>
+>   ```txt
+>   botocore.errorfactory.ResourceLimitExceeded: An error occurred (ResourceLimitExceeded) when calling the CreateEndpoint operation: The account-level service limit 'ml.g4dn.xlarge for endpoint usage' is 0 Instances, with current utilization of 0 Instances and a request delta of 1 Instances. Please contact AWS support to request an increase for this limit.
+>   ```
+>
+>   This is GPU-based instances have restricted access on AWS. You need to request AWS to have access to those instances. You can do it via the "Service Quotas" and request a new quota for the `ml.g4dn.xlarge` instance, as show in the image below
+>
+>   ![AWS Quotas](assets/aws-quota.png)
+> </details>
+
+When the endpoint is ready, you will be able to see it in the AWS console like the following image:
 
 ![AWS console with SageMaker endpoints](assets/aws-console-sagemaker-1-blurried.png)
 

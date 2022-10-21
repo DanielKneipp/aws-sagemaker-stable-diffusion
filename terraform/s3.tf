@@ -1,6 +1,6 @@
 
 resource "aws_s3_bucket" "dkneipp_sagemaker" {
-  bucket = "dkneipp-sagemaker"
+  bucket = var.bucket_name
 }
 
 resource "aws_s3_bucket_acl" "dkneipp_sagemaker" {

@@ -31,7 +31,7 @@ Assuming you already have `asdf` and `pyenv` installed:
 INSTALL_TOOLING=true bash setup.sh
 
 cd terraform/ && terraform init && terraform apply && cd ../
-cd sagemaker/ && pip install -r requirements && bash zip-model.sh && cd ../
+cd sagemaker/ && pip install -r requirements && bash zip-model.sh && python sagemaker-create-endpoint.py cd ../
 cd lambda/sd-public-endpoint/ && pip install -r requirements.txt && bash deploy.sh && cd ../../
 ```
 

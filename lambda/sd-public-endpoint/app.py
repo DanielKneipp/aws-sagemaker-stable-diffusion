@@ -32,9 +32,13 @@ def make_response(res):
     )
 
 
-@app.route("/")
-def index():
-    return "Online Stable Diffusion"
+def make_response_v2(res):
+    return res
+    # return Response(
+    #     body=res,
+    #     status_code=200,
+    #     headers={"Content-Type": "application/json"}
+    # )
 
 
 def inference(prompt=""):
@@ -54,13 +58,16 @@ def inference_with_prompt(prompt):
     return make_response(res)
 
 
-@app.route("/inference")
-def inference_without_prompt():
-    res = inference(sentence_generator.sentence())
-    return make_response(res)
+@app.route("/v2/inference/{prompt}")
+def inference_with_prompt(prompt):
+    prompt = unquote(prompt)
+    res = inference(prompt)
+    return make_response_v2(res)
 
 
-@app.route("/inference/default")
-def inference_without_prompt():
-    res = inference("a photo of an astronaut riding a horse on mars")
-    return make_response(res)
+@app.route("/inference", methods=['POST'])
+def inference_with_prompt():
+    data = app.current_request.raw_body.decode()
+    prompt = data.prompt
+    res = inference(prompt)
+    return make_response_v2(res)

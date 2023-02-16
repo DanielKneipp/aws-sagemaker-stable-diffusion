@@ -9,6 +9,6 @@ resource "local_file" "lambda_role_arn" {
 }
 
 resource "local_file" "s3_bucket_name" {
-  content  = aws_s3_bucket.dkneipp_sagemaker.id
+  content  = aws_s3_bucket.bucket_sagemaker.id
   filename = "bucket-name.txt"
 }

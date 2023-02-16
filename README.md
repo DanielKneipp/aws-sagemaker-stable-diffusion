@@ -31,25 +31,25 @@ Assuming you already have `asdf` and `pyenv` installed:
 INSTALL_TOOLING=true bash setup.sh
 
 cd terraform/ && terraform init && terraform apply && cd ../
-cd sagemaker/ && pip install -r requirements && bash zip-model.sh && python sagemaker-create-endpoint.py cd ../
+cd sagemaker/ && pip install -r requirements.txt && bash zip-model.sh && python sagemaker-create-endpoint.py && cd ../
 cd lambda/sd-public-endpoint/ && pip install -r requirements.txt && bash deploy.sh && cd ../../
 ```
 
 The endpoint that will appear in the output can be used for the inferences. And here's how to use it
 
-- `<endpoint>/`              -> Generates a random description and feeds it into the model
-- `<endpoint>/default`       -> Uses the default description "a photo of an astronaut riding a horse on mars"
+- `<endpoint>/` -> Generates a random description and feeds it into the model
+- `<endpoint>/default` -> Uses the default description "a photo of an astronaut riding a horse on mars"
 - `<endpoint>/<description>` -> Uses the `<description>` as input for the model. You can use spaces here.
 
 ## Setting things up
 
 For this repo, you will need these tools:
 
-| Tool | Version |
-| ---- | ------- |
-| `awscli` | 2.8.2 |
-| `terraform` | 1.3.2 |
-| `python` | 3.9.13 |
+| Tool        | Version |
+| ----------- | ------- |
+| `awscli`    | 2.8.2   |
+| `terraform` | 1.3.2   |
+| `python`    | 3.9.13  |
 
 For python, it's recommended to use [`pyenv`](https://github.com/pyenv/pyenv-installer), which allows you to install several versions of python at the same time with simple commands like this: `pyenv install 3.9.13`
 
@@ -99,7 +99,7 @@ And you can change the description by changing the content of the `prompt` varia
 
 Cool, so now that we have the inference code working, is time to put this in the cloud to, ultimately, make it available to others. Let's start by talking about the resource we'll need and the overall architecture.
 
-Firstly, about how the ML model will be executed, although we could simply spin-up an EC2 instance and attach a web-server to it to receive the images as requests, we will use [AWS SageMaker](https://aws.amazon.com/pt/sagemaker/), which allows us to do exactly that and much more in a managed way (it means that several components, e.g. the web-server implementation, will be managed by AWS). SageMaker will manage the EC2 instance with a GPU and will give us a [***private***](https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints-deployment.html) endpoint to interact with the model. Since we are using huggingface, both have a nice integration and you can learn more about it from the [huggingface docs about SageMaker](https://huggingface.co/docs/sagemaker/inference) or the [AWS docs about huggingface](https://docs.aws.amazon.com/sagemaker/latest/dg/hugging-face.html) 🤝.
+Firstly, about how the ML model will be executed, although we could simply spin-up an EC2 instance and attach a web-server to it to receive the images as requests, we will use [AWS SageMaker](https://aws.amazon.com/pt/sagemaker/), which allows us to do exactly that and much more in a managed way (it means that several components, e.g. the web-server implementation, will be managed by AWS). SageMaker will manage the EC2 instance with a GPU and will give us a [**_private_**](https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints-deployment.html) endpoint to interact with the model. Since we are using huggingface, both have a nice integration and you can learn more about it from the [huggingface docs about SageMaker](https://huggingface.co/docs/sagemaker/inference) or the [AWS docs about huggingface](https://docs.aws.amazon.com/sagemaker/latest/dg/hugging-face.html) 🤝.
 
 However, one thing to notice is that SageMaker will provide a private endpoint only accessible if you have access to the AWS account associated with the resource. Since we want a public endpoint, we need to put on top of it a [lambda](https://aws.amazon.com/lambda/?nc1=h_ls) that will forward requests from an [API Gateway](https://aws.amazon.com/api-gateway/). This combination follows the recommended approach from an official [AWS blog post](https://aws.amazon.com/blogs/machine-learning/call-an-amazon-sagemaker-model-endpoint-using-amazon-api-gateway-and-aws-lambda/).
 
@@ -111,10 +111,10 @@ Putting it all together, the architecture goes like this:
 
 Showing all resources needed and from which directory each resource is managed. Here is a brief description:
 
-| Directory | Description |
-| --------- | ----------- |
-| `lambda`  | Has the lambda + API Gateway implementation using a framework called [chalice](https://aws.github.io/chalice/#)|
-| `sagemaker` | Contains the python code to manage the SageMaker Model, Endpoint, and the custom inference code. It also has the script used to pack and send the model to an S3 bucket |
+| Directory   | Description                                                                                                                                                                         |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lambda`    | Has the lambda + API Gateway implementation using a framework called [chalice](https://aws.github.io/chalice/#)                                                                     |
+| `sagemaker` | Contains the python code to manage the SageMaker Model, Endpoint, and the custom inference code. It also has the script used to pack and send the model to an S3 bucket             |
 | `terraform` | Manages the S3 bucket itself and the IAM roles required by the lambda code (to access the SageMaker endpoint) and for the Sagemaker endpoint (to access the model on the S3 bucket) |
 
 ### Initial setup
@@ -131,10 +131,10 @@ In total 11 resources should be created. In this process, a couple of `.txt` wil
 
 A brief explanation of the roles is as follows:
 
-| Role | Name on IAM | Description |
-| ---- | ----------- | ----------- |
-| SageMaker Endpoint Access | `lambda-sagemaker-access` | This role basically allows the lambda to execute properly (with the `AWSLambdaBasicExecutionRole` managed policy) and also allows it to invoke a SageMaker endpoint |
-| SageMaker Full Access | `sagemaker-admin` | This one has the `AmazonSageMakerFullAccess` managed policy attached to it, which allows, [among other things](https://docs.aws.amazon.com/sagemaker/latest/dg/sagemaker-roles.html#sagemaker-roles-create-execution-role), for the SageMaker endpoint to access the S3 bucket to load the model, and also to publish it own logs |
+| Role                      | Name on IAM               | Description                                                                                                                                                                                                                                                                                                                       |
+| ------------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SageMaker Endpoint Access | `lambda-sagemaker-access` | This role basically allows the lambda to execute properly (with the `AWSLambdaBasicExecutionRole` managed policy) and also allows it to invoke a SageMaker endpoint                                                                                                                                                               |
+| SageMaker Full Access     | `sagemaker-admin`         | This one has the `AmazonSageMakerFullAccess` managed policy attached to it, which allows, [among other things](https://docs.aws.amazon.com/sagemaker/latest/dg/sagemaker-roles.html#sagemaker-roles-create-execution-role), for the SageMaker endpoint to access the S3 bucket to load the model, and also to publish it own logs |
 
 ### Deploy on AWS using SageMaker
 
@@ -165,15 +165,16 @@ python sagemaker-create-endpoint.py
 > <details>
 >   <summary><em>⚠️ In case you receive a <code>ResourceLimitExceeded</code> error...</em></summary>
 >
->   In case you receive a `ResourceLimitExceeded` error like the following:
+> In case you receive a `ResourceLimitExceeded` error like the following:
 >
->   ```txt
->   botocore.errorfactory.ResourceLimitExceeded: An error occurred (ResourceLimitExceeded) when calling the CreateEndpoint operation: The account-level service limit 'ml.g4dn.xlarge for endpoint usage' is 0 Instances, with current utilization of 0 Instances and a request delta of 1 Instances. Please contact AWS support to request an increase for this limit.
->   ```
+> ```txt
+> botocore.errorfactory.ResourceLimitExceeded: An error occurred (ResourceLimitExceeded) when calling the CreateEndpoint operation: The account-level service limit 'ml.g4dn.xlarge for endpoint usage' is 0 Instances, with current utilization of 0 Instances and a request delta of 1 Instances. Please contact AWS support to request an increase for this limit.
+> ```
 >
->   This is GPU-based instances have restricted access on AWS. You need to request AWS to have access to those instances. You can do it via the "Service Quotas" and request a new quota for the `ml.g4dn.xlarge` instance, as show in the image below
+> This is GPU-based instances have restricted access on AWS. You need to request AWS to have access to those instances. You can do it via the "Service Quotas" and request a new quota for the `ml.g4dn.xlarge` instance, as show in the image below
 >
->   ![AWS Quotas](assets/aws-quota.png)
+> ![AWS Quotas](assets/aws-quota.png)
+>
 > </details>
 
 When the endpoint is ready, you will be able to see it in the AWS console like the following image:
@@ -192,8 +193,8 @@ And we should get a cool image like this one in `sagemaker/output/image.jpg`:
 
 And it's nice that we just this amount of code, now we have a deployment of a ML model server with metrics, logs, health checks, etc. available, as we can see in the following images.
 
-| Metrics | Logs |
-| ------- | ---- |
+| Metrics                                                    | Logs                                                 |
+| ---------------------------------------------------------- | ---------------------------------------------------- |
 | ![AWS SageMaker metrics](assets/aws-sagemaker-metrics.png) | ![AWS SageMaker logs](assets/aws-sagemaker-logs.png) |
 
 > Yes, to get that cool image from Darth Vader, lots of attempts were required 😅
@@ -229,11 +230,11 @@ The script will get the proper IAM role and deploy the app.
 
 And now you should have a public endpoint to access the Model, you should be able to use the app like this:
 
-| Page | Description | Image |
-| ---- | ----------- | ----- |
-| `/api/` | The home page, just for testing | ![App Index](assets/public-endpoint-index.png) |
-| `/api/inference/<text>` | You can type any text replacing `<text>` and that will become the input for the model, Go wild 🦄 (and you can use spaces) | ![App manual inference](assets/public-endpoint-inference-manual.gif) |
-| `/api/inference/` | And that were the fun actually begins!! If you leave the `<text>` empty, a [random sentence generator](https://pypi.org/project/essential-generators/) will be used to automatically generate the input for the Model. Let programs "talk" to each other and you will be able to use the sentence used below the image | ![App Random Inference](assets/public-endpoint-inference.png) |
+| Page                    | Description                                                                                                                                                                                                                                                                                                            | Image                                                                |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `/api/`                 | The home page, just for testing                                                                                                                                                                                                                                                                                        | ![App Index](assets/public-endpoint-index.png)                       |
+| `/api/inference/<text>` | You can type any text replacing `<text>` and that will become the input for the model, Go wild 🦄 (and you can use spaces)                                                                                                                                                                                             | ![App manual inference](assets/public-endpoint-inference-manual.gif) |
+| `/api/inference/`       | And that were the fun actually begins!! If you leave the `<text>` empty, a [random sentence generator](https://pypi.org/project/essential-generators/) will be used to automatically generate the input for the Model. Let programs "talk" to each other and you will be able to use the sentence used below the image | ![App Random Inference](assets/public-endpoint-inference.png)        |
 
 ## Clean-up
 

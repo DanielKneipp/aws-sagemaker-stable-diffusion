@@ -7,5 +7,5 @@ output "lambda_role_arn" {
 }
 
 output "s3_bucket_name" {
-  value = aws_s3_bucket.dkneipp_sagemaker.id
+  value = aws_s3_bucket.bucket_sagemaker.id
 }
